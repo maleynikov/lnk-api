@@ -11,6 +11,7 @@ const (
 
 type Config struct {
 	Port int
+	DSN  string
 }
 
 func LoadConfig() (*Config, error) {
@@ -24,5 +25,6 @@ func LoadConfig() (*Config, error) {
 
 			return port
 		}(defPort),
+		DSN: "postgres://maxim:@localhost:5432/url_short",
 	}, nil
 }

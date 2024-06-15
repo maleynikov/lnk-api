@@ -5,53 +5,41 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
+	"gitlab.maleynikov.me/url-short/api/pkg/app/models"
 	"gitlab.maleynikov.me/url-short/api/pkg/util"
 )
 
-type ErrResponse struct {
-	Err            error `json:"-"`
-	HTTPStatusCode int   `json:"-"`
-
-	StatusText string `json:"status"`
-	AppCode    int64  `json:"code,omitempty"`
-	ErrorText  string `json:"error,omitempty"`
-}
-
-func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, e.HTTPStatusCode)
-	return nil
-}
-
-func ErrInvalidRequest(err error) render.Renderer {
-	return &ErrResponse{
-		Err:            err,
-		HTTPStatusCode: 400,
-		StatusText:     "Invalid request.",
-		ErrorText:      err.Error(),
-	}
-}
-
-type ShortPayload struct {
+type ShortRequest struct {
 	URL string `json:"url"`
 }
 
-type ShortRequest struct {
-	*ShortPayload
+type ShortResponse struct {
+	Code string `json:"code"`
+}
+
+func (b *ShortResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
 }
 
 func (b *ShortRequest) Bind(r *http.Request) error {
-	if b.ShortPayload == nil {
-		return errors.New("missing required ShortPayload fields")
+	if b.URL == "" {
+		return errors.New("missing required URL field")
 	}
 	return nil
 }
 
-func ShortHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Short(w http.ResponseWriter, r *http.Request) {
 	data := &ShortRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
 		return
 	}
+	url := models.Url{
+		Code:  util.OID(data.URL),
+		Value: data.URL,
+	}
+	h.db.Create(&url)
 
-	w.Write([]byte("URL OID: " + util.OID(data.URL)))
+	render.Status(r, http.StatusCreated)
+	render.Render(w, r, &ShortResponse{Code: url.Code})
 }
