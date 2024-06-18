@@ -12,14 +12,6 @@ type Data []struct {
 	CreatedAt string `json:"created_at"`
 }
 
-type StatResponse struct {
-	Data `json:"data"`
-}
-
-func (b *StatResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
 func (h *Handler) Stat(w http.ResponseWriter, r *http.Request) {
 
 	query := h.db.Table("statistics s").
@@ -35,5 +27,5 @@ func (h *Handler) Stat(w http.ResponseWriter, r *http.Request) {
 	query.Scan(&data)
 
 	render.Status(r, http.StatusOK)
-	render.Render(w, r, &StatResponse{Data: data})
+	render.Render(w, r, Ok(data))
 }

@@ -13,14 +13,6 @@ type ShortRequest struct {
 	URL string `json:"url"`
 }
 
-type ShortResponse struct {
-	Code string `json:"code"`
-}
-
-func (b *ShortResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
 func (b *ShortRequest) Bind(r *http.Request) error {
 	if b.URL == "" {
 		return errors.New("missing required URL field")
@@ -31,7 +23,7 @@ func (b *ShortRequest) Bind(r *http.Request) error {
 func (h *Handler) Short(w http.ResponseWriter, r *http.Request) {
 	data := &ShortRequest{}
 	if err := render.Bind(r, data); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err))
+		render.Render(w, r, Err(err))
 		return
 	}
 	url := models.Url{
@@ -41,5 +33,7 @@ func (h *Handler) Short(w http.ResponseWriter, r *http.Request) {
 	h.db.Create(&url)
 
 	render.Status(r, http.StatusCreated)
-	render.Render(w, r, &ShortResponse{Code: url.Code})
+	render.Render(w, r, Ok(struct {
+		Code string `json:"code"`
+	}{Code: url.Code}))
 }
