@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"gitlab.maleynikov.me/url-short/api/pkg/app/handlers"
 )
@@ -16,6 +17,13 @@ func (s *Server) routes() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	// Define routes
@@ -25,6 +33,7 @@ func (s *Server) routes() http.Handler {
 	r.Post("/short", h.Short)
 	r.Get("/r:{oid}", h.Redirect)
 	r.Get("/stat", h.Stat)
+	r.Options("/", func(w http.ResponseWriter, r *http.Request) {})
 
 	return r
 }
