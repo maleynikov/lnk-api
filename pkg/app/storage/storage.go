@@ -49,7 +49,7 @@ func NewStorage(cfg *app.Config) (*Storage, error) {
 	storage := &Storage{
 		DB: db,
 	}
-	// storage.Migrate()
+	storage.Migrate()
 
 	return storage, nil
 }
