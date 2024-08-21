@@ -1,6 +1,6 @@
-PHONY: run build
+PHONY: run bin
 
 run:
 	go run ./cmd
-build:
+bin:
 	go build -o bin/lnk-api ./cmd
