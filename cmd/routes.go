@@ -30,7 +30,7 @@ func (s *Server) routes() http.Handler {
 	h := handlers.NewHandler(s.storage.DB)
 
 	r.Get("/", h.Index)
-	r.Post("/short", h.Short)
+	r.Post("/cut", h.Short)
 	r.Get("/r:{oid}", h.Redirect)
 	r.Get("/stat", h.Stat)
 	r.Options("/", func(w http.ResponseWriter, r *http.Request) {})
