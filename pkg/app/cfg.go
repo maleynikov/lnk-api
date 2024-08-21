@@ -25,6 +25,6 @@ func LoadConfig() (*Config, error) {
 
 			return port
 		}(defPort),
-		DSN: "postgres://lnk:@localhost:5432/lnkdb",
+		DSN: "postgres://lnk:123456@localhost:5432/lnkdb",
 	}, nil
 }
